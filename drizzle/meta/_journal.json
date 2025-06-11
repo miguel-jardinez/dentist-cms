@@ -15,6 +15,13 @@
       "when": 1749601339765,
       "tag": "0001_table_for_organization_created",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749615800629,
+      "tag": "0002_table_for_admin_generated",
+      "breakpoints": true
     }
   ]
 }
