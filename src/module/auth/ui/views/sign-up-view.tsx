@@ -1,7 +1,12 @@
 "use client";
 
+import SignUpForm from "../components/sign-up-form";
+
 const SignUpView = () => (
-  <div>Sign up view</div>
+  <div className="mx-auto container">
+    <SignUpForm />
+    <div>Sign up view</div>
+  </div>
 );
  
 export default SignUpView;

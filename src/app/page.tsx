@@ -1,11 +1,18 @@
-import Link from "next/link";
+import { headers } from "next/headers";
 
-import { Button } from "@dentist/components/ui/button";
+import LandingView from "@dentist/module/landing/ui/views/landing-view";
+import { auth } from "@dentist/utils/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
   return (
-    <Button asChild>
-      <Link href="/auth/sign-in">Sign in</Link>
-    </Button>
+    <>
+      {JSON.stringify(session, null, 2)}
+      Hola mundo
+      <LandingView />
+    </>
   );
 }
