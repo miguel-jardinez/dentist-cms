@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { organization } from "better-auth/plugins";
+import { adminClient } from "better-auth/client/plugins";
+import { admin, organization } from "better-auth/plugins";
 
 import { db } from "@dentist/db";
 import * as schema from "@dentist/db/schema";
@@ -24,6 +25,8 @@ export const auth = betterAuth({
     } 
   },
   plugins: [
-    organization()
+    organization(),
+    admin(),
+    adminClient()
   ]
 });
