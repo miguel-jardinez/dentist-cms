@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import PatientsView from "@dentist/module/patients/patients-view";
+import ImagesView from "@dentist/module/images/ui/views/images-view";
 import { auth } from "@dentist/utils/auth";
 
-const PatientsPage = async () => {
+const ImagesPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -13,7 +13,7 @@ const PatientsPage = async () => {
     redirect("/auth/sign-in");
   }
 
-  return <PatientsView />;
+  return <ImagesView />;
 };
- 
-export default PatientsPage;
+
+export default ImagesPage;

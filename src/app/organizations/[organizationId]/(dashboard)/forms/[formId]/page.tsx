@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import PatientsView from "@dentist/module/patients/patients-view";
+import FormIdView from "@dentist/module/forms/ui/views/form-id-view";
 import { auth } from "@dentist/utils/auth";
 
-const PatientsPage = async () => {
+const FormIdPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -13,7 +13,7 @@ const PatientsPage = async () => {
     redirect("/auth/sign-in");
   }
 
-  return <PatientsView />;
+  return <FormIdView />;
 };
  
-export default PatientsPage;
+export default FormIdPage;
