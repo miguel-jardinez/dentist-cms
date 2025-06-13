@@ -1,11 +1,11 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import HomeView from "@dentist/module/home/ui/views/home-view";
+import MessagesView from "@dentist/module/messages/ui/views/messages-view";
 import { auth } from "@dentist/utils/auth";
 
-const HomePage = async () => {
-  const session = auth.api.getSession({
+const MessagesPage = async () => {
+  const session = await auth.api.getSession({
     headers: await headers()
   });
 
@@ -13,7 +13,7 @@ const HomePage = async () => {
     redirect("/auth/sign-in");
   }
 
-  return <HomeView />;
+  return <MessagesView />;
 };
- 
-export default HomePage;
+
+export default MessagesPage;

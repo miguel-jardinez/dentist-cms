@@ -16,7 +16,7 @@ const SelectOrganizationView = ({ organizations }: SelectOrganizationViewProps) 
   const router = useRouter();
 
   const onOrgSelect = useCallback((orgId: string) => {
-    router.push(`/organizations/${orgId}`);
+    router.push(`/organizations/${orgId}/dashboard`);
   }, [router]);
 
   return (
