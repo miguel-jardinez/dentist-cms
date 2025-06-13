@@ -36,7 +36,7 @@ const SignInForm = () => {
       },
       onSuccess: () => {
         setIsLoading(false);
-        router.push("/dashboard");
+        router.push("/organizations");
       },
       onError: ({ error }) => {
         setIsLoading(false);
