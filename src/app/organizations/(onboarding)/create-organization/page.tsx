@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import OrganizationView from "@dentist/module/organization/ui/views/organization-view";
+import CreateOrganizationView from "@dentist/module/organization/ui/views/create-organization-view";
 import { auth } from "@dentist/utils/auth";
 
-const Organizations = async () => {
+const CreateOrganizationPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -15,9 +15,9 @@ const Organizations = async () => {
 
   return (
     <>
-      <OrganizationView userId={session.session.userId} />
+      <CreateOrganizationView userId={session.session.userId} />
     </>
   );
 };
  
-export default Organizations;
+export default CreateOrganizationPage;
