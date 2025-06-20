@@ -1,7 +1,9 @@
+import { HydrationBoundary } from "@tanstack/react-query";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import ReviewsView from "@dentist/module/reviews/ui/views/reviews-view";
+import { getQueryClient, trpc } from "@dentist/trpc/server";
 import { auth } from "@dentist/utils/auth";
 
 const ReviewsPage = async () => {
@@ -13,7 +15,16 @@ const ReviewsPage = async () => {
     redirect("/auth/sign-in");
   }
 
-  return <ReviewsView />;
+  const queryClient = getQueryClient();
+  void queryClient.prefetchQuery(trpc.forms.getMany.queryOptions());
+
+  return (
+    <>
+      <HydrationBoundary state={queryClient}>
+        <ReviewsView />
+      </HydrationBoundary>
+    </>
+  );
 };
- 
+
 export default ReviewsPage;
