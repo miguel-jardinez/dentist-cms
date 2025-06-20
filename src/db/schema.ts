@@ -1,4 +1,11 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
+
+// Enums
+export const formStatusEnum = pgEnum("form_status", ["draft", "published", "archived"]);
+export const questionTypeEnum = pgEnum("question_type", ["multiple_choice", "yes_no", "text", "textarea"]);
+export const responseStatusEnum = pgEnum("response_status", ["draft", "completed", "archived", "locked"]);
+export const permissionEnum = pgEnum("permission", ["view", "edit", "admin"]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -77,4 +84,97 @@ export const invitation = pgTable("invitation", {
   status: text("status").default("pending").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   inviterId: text("inviter_id").notNull().references(() => user.id, { onDelete: "cascade" })
+});
+
+export const form = pgTable("form", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_${nanoid()}`),
+  title: text("title").notNull(),
+  description: text("description"),
+  isShared: boolean("is_shared").default(false).notNull(),
+  status: formStatusEnum("status").default("draft").notNull(),
+  version: text("version").default("1.0").notNull(),
+  createdBy: text("created_by").notNull().references(() => user.id),
+  ownerOrganizationId: text("owner_organization_id").notNull().references(() => organization.id, { onDelete: "cascade" }),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const formSection = pgTable("form_section", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_sec_${nanoid()}`),
+  formId: text("form_id").notNull().references(() => form.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  order: integer("order").notNull(),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const formQuestion = pgTable("form_question", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_q_${nanoid()}`),
+  sectionId: text("section_id").notNull().references(() => formSection.id, { onDelete: "cascade" }),
+  type: questionTypeEnum("type").notNull(),
+  question: text("question").notNull(),
+  isRequired: boolean("is_required").default(false).notNull(),
+  order: integer("order").notNull(),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const questionOption = pgTable("question_option", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_opt_${nanoid()}`),
+  questionId: text("question_id").notNull().references(() => formQuestion.id, { onDelete: "cascade" }),
+  text: text("text").notNull(),
+  value: text("value").notNull(),
+  order: integer("order").notNull(),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const formResponse = pgTable("form_response", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_resp_${nanoid()}`),
+  formId: text("form_id").notNull().references(() => form.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organization.id, { onDelete: "cascade" }),
+  patientId: text("patient_id").references(() => user.id),
+  status: responseStatusEnum("status").default("draft").notNull(),
+  submittedAt: timestamp("submitted_at"),
+  lastEditedAt: timestamp("last_edited_at"),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const responseAnswer = pgTable("response_answer", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_ans_${nanoid()}`),
+  responseId: text("response_id").notNull().references(() => formResponse.id, { onDelete: "cascade" }),
+  questionId: text("question_id").notNull().references(() => formQuestion.id, { onDelete: "cascade" }),
+  answer: text("answer").notNull(),
+  lastEditedAt: timestamp("last_edited_at"),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const formShare = pgTable("form_share", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_share_${nanoid()}`),
+  formId: text("form_id").notNull().references(() => form.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organization.id, { onDelete: "cascade" }),
+  permission: permissionEnum("permission").default("view").notNull(),
+  sharedBy: text("shared_by").notNull().references(() => user.id),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const formTag = pgTable("form_tag", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_tag_${nanoid()}`),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
+});
+
+export const formTagRelation = pgTable("form_tag_relation", {
+  id: text("id").primaryKey().$defaultFn(() => `frm_tag_rel_${nanoid()}`),
+  formId: text("form_id").notNull().references(() => form.id, { onDelete: "cascade" }),
+  tagId: text("tag_id").notNull().references(() => formTag.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull()
 });
