@@ -1,10 +1,13 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { adminClient } from "better-auth/client/plugins";
-import { admin, organization } from "better-auth/plugins";
+import { organization } from "better-auth/plugins";
+import { Resend } from "resend";
 
 import { db } from "@dentist/db";
 import * as schema from "@dentist/db/schema";
+import { SendInvite } from "@dentist/module/emails/ui/templates/send-invitation";
+
+const RESEND_CLIENT = new Resend(process.env.RESEND_DENTIST_CMS);
  
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -25,8 +28,17 @@ export const auth = betterAuth({
     } 
   },
   plugins: [
-    organization(),
-    admin(),
-    adminClient()
+    organization({
+      async sendInvitationEmail(data) {
+        // const inviteLink = `http://localhost:3000/organizations/welcome-invite?invitationId=${data.invitationId}`;
+
+        await RESEND_CLIENT.emails.send({
+          from: "Dentist CMS <onboarding@resend.dev>",
+          to: data.email,
+          subject: "You've been invited to join Dentist CMS",
+          react: await SendInvite({ invitationId: data.id })
+        });
+      }
+    })
   ]
 });
